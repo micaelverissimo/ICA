@@ -1,0 +1,19 @@
+# Editor temporaries
+*~
+*.swp
+
+# OSX dir files
+.DS_Store
+
+# Compiled python
+*.pyc
+
+
+# IPython notebook checkpoints
+*/.ipynb_checkpoints
+
+# Mix recipe - Key
+
+Mixture.ipynb
+
+# Result Fo
