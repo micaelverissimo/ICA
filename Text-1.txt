@@ -1,9 +1,0 @@
-export MY_PATH=$PWD
-
-cd $MY_PATH
-
-export PYTHONPATH=$PYTHONPATH:/home/micael/MyWorkspace/ICA
-
-echo
-echo "Now is everything all right"
-echo 
