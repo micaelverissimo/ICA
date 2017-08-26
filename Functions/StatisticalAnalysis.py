@@ -48,6 +48,32 @@ def KLDiv(p, q, bins=np.array([-1,0, 1]), mode='kernel', kernel='epanechnikov', 
                 kl_values = np.append(kl_values,kl_value)
     return [np.sum(kl_values),kl_values]
 
+def CreateKLsMatrix(components,sources):
+    KL_ida = np.zeros([components.shape[0],components.shape[0]])
+    KL_volta = np.zeros([components.shape[0],components.shape[0]])
+    for j in range(components.shape[0]):
+        for i in range(components.shape[0]):
+            KL_ida[i][j]= KLDiv(components[i,:],sources[j,:],bins='sqrt', mode='hist', kernel='epanechnikov', kernel_bw=0.1)[0]
+            KL_volta[i][j]= KLDiv(sources[i,:],components[j,:],bins='sqrt', mode='hist', kernel='epanechnikov', kernel_bw=0.1)[0]
+
+    return [KL_ida,KL_volta]
+
+
+#Calculate the Simetric Kullback-Leibler Divergence
+def SKLDiv(A,B):
+    SKLDiv = np.mean( np.array([ A, B ]), axis=0 )
+    return SKLDiv
+
+
+#Calculate the Jensen-Shanon Divergence
+def JSDiv(A,B):
+    JSDiv = np.zeros([A.shape[0],A.shape[0]])
+    for j in range(A.shape[0]):
+        for i in range(A.shape[0]):
+            M_ij = 0.5*(A[i,:]+B[j,:])
+            JSDiv[i][j]=0.5*(KLDiv(A[i,:],M_ij,bins='sqrt', mode='hist', kernel='epanechnikov', kernel_bw=0.1)[0] +KLDiv(B[j,:],M_ij,bins='sqrt', mode='hist', kernel='epanechnikov', kernel_bw=0.1)[0])
+            
+    return JSDiv
 
 # https://gist.github.com/GaelVaroquaux/ead9898bd3c973c40429
 '''
