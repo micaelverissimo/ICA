@@ -74,6 +74,74 @@ def JSDiv(A,B):
             JSDiv[i][j]=0.5*(KLDiv(A[i,:],M_ij,bins='sqrt', mode='hist', kernel='epanechnikov', kernel_bw=0.1)[0] +KLDiv(B[j,:],M_ij,bins='sqrt', mode='hist', kernel='epanechnikov', kernel_bw=0.1)[0])
             
     return JSDiv
+'''
+    Caculate the mutual information using sklearn
+'''
+
+from sklearn.metrics import mutual_info_score
+import matplotlib.pyplot as plt
+
+def calc_MI(x, y):
+    bins = min( len(np.histogram(x,'fd')[0]), len(np.histogram(y,'fd')[0]))
+    c_xy = np.histogram2d(x, y, bins)[0]
+    mi = mutual_info_score(None, None, contingency=c_xy)
+    #mi_normed = np.sqrt(1. - np.exp(-2 * mi))
+    return mi
+
+def create_mutual_info_matrix(data_set1,data_set2):
+    '''
+    data_set1 and data_set2 = array[features,n_samples]
+    calculate the mutual information between two variables defined in data_set1 and data_set2
+    '''
+    mutual_info_matrix = np.zeros([data_set1.shape[0],data_set2.shape[0]])
+
+    for irow in range(mutual_info_matrix.shape[0]):
+        for jcol in range(mutual_info_matrix.shape[1]):
+            mutual_info_matrix[irow,jcol] = calc_MI(data_set1[irow,:],data_set2[jcol,:])
+    return mutual_info_matrix
+
+def plot_mutual_info(mutual_info_matrix,title='',output='',name='',save=False):
+    fig = plt.figure(figsize=(10,9))
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+
+    data_labels=['comp '+str(i+1) for i in range(mutual_info_matrix.shape[0])]
+    mutual_info_matrix_norm = 100.0*mutual_info_matrix
+    im = ax.imshow(mutual_info_matrix_norm, interpolation='nearest', cmap=plt.cm.Greys,clim=(0.0, 100.0))
+
+    width, height = mutual_info_matrix_norm.shape
+
+
+    for x in xrange(width):
+        for y in xrange(height):
+            if mutual_info_matrix_norm[x][y] < 50.0:
+                ax.annotate('%1.3f%%'%(mutual_info_matrix_norm[x][y]), xy=(y, x),
+                            horizontalalignment='center',
+                            verticalalignment='center', fontsize=15)
+            elif mutual_info_matrix_norm[x][y] > 100.0:
+                ax.annotate('100%', xy=(y, x),
+                            horizontalalignment='center',
+                            verticalalignment='center',color='white', fontsize=15)
+            else:
+                ax.annotate('%1.3f%%'%(mutual_info_matrix_norm[x][y]), xy=(y, x),
+                            horizontalalignment='center',
+                            verticalalignment='center',color='white', fontsize=15)
+
+    ax.set_title('Mutual Information '+title,fontweight='bold',fontsize=15)
+    fig.colorbar(im)
+
+    tick_marks = np.arange(len(data_labels))
+    ax.xaxis.set_ticks(tick_marks)
+    ax.xaxis.set_ticklabels(data_labels,fontweight='bold',fontsize=15)
+
+    ax.yaxis.set_ticks(tick_marks)
+    ax.yaxis.set_ticklabels(data_labels,fontweight='bold',fontsize=15)
+    if save:
+        fig.savefig(output+'/'+name+'.pdf')
+        return plt.show()
+    else:
+        return plt.show()
+
 
 # https://gist.github.com/GaelVaroquaux/ead9898bd3c973c40429
 '''
