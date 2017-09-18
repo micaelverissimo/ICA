@@ -11,7 +11,7 @@ from sklearn.neighbors import KernelDensity
 def EstPDF(data, bins=np.array([-1,0, 1]), mode='kernel', kernel='epanechnikov', kernel_bw=0.01):
     # kernels = 'epanechnikov','gaussian', 'tophat','exponential', 'linear', 'cosine'
     if mode == 'hist':
-        print 'EstPDF: Histogram Mode'
+        #print 'EstPDF: Histogram Mode'
         [y,pts] = np.histogram(data,bins=bins,density=True)
         bins_centers = pts[0:-1]+np.diff(pts)
         pdf = y*np.diff(pts)
@@ -75,18 +75,26 @@ def JSDiv(A,B):
             
     return JSDiv
 '''
-    Caculate the mutual information using sklearn
+    Caculate the mutual information using sklearn NORMALIZED
 '''
 
 from sklearn.metrics import mutual_info_score
 import matplotlib.pyplot as plt
+from scipy.stats import entropy as et
 
 def calc_MI(x, y):
     bins = min( len(np.histogram(x,'fd')[0]), len(np.histogram(y,'fd')[0]))
+    '''
+    Primeiro precisamos da entropia de x e y para apos o calculo da MI dividir pela raiz do produto das entropias de x e y
+    '''
+    c_x = np.histogram(x,bins,normed=True)[0]
+    c_y = np.histogram(y,bins,normed=True)[0]
+    H_x = et(c_x)
+    H_y = et(c_y)
     c_xy = np.histogram2d(x, y, bins)[0]
     mi = mutual_info_score(None, None, contingency=c_xy)
     #mi_normed = np.sqrt(1. - np.exp(-2 * mi))
-    return mi
+    return mi/(np.sqrt(H_x*H_y))
 
 def create_mutual_info_matrix(data_set1,data_set2):
     '''
@@ -118,10 +126,10 @@ def plot_mutual_info(mutual_info_matrix,title='',output='',name='',save=False):
                 ax.annotate('%1.3f%%'%(mutual_info_matrix_norm[x][y]), xy=(y, x),
                             horizontalalignment='center',
                             verticalalignment='center', fontsize=15)
-            elif mutual_info_matrix_norm[x][y] > 100.0:
-                ax.annotate('100%', xy=(y, x),
-                            horizontalalignment='center',
-                            verticalalignment='center',color='white', fontsize=15)
+            #elif mutual_info_matrix_norm[x][y] > 100.0:
+            #    ax.annotate('100%', xy=(y, x),
+            #                horizontalalignment='center',
+            #                verticalalignment='center',color='white', fontsize=15)
             else:
                 ax.annotate('%1.3f%%'%(mutual_info_matrix_norm[x][y]), xy=(y, x),
                             horizontalalignment='center',
