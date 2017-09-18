@@ -151,6 +151,47 @@ def plot_mutual_info(mutual_info_matrix,title='',output='',name='',save=False):
         return plt.show()
 
 
+
+def plot_in_matrix(mutual_info_matrix,title='',output='',name='',save=False):
+    fig = plt.figure(figsize=(10,9))
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+
+    data_labels=['comp '+str(i+1) for i in range(mutual_info_matrix.shape[0])]
+    mutual_info_matrix_norm = 100.0*mutual_info_matrix
+    im = ax.imshow(mutual_info_matrix_norm, interpolation='nearest', cmap=plt.cm.Greys,clim=(0.0, 100.0))
+
+    width, height = mutual_info_matrix_norm.shape
+
+
+    for x in xrange(width):
+        for y in xrange(height):
+            if mutual_info_matrix_norm[x][y] < 50.0:
+                ax.annotate('%1.3f%%'%(mutual_info_matrix_norm[x][y]), xy=(y, x),
+                            horizontalalignment='center',
+                            verticalalignment='center', fontsize=15)
+            else:
+                ax.annotate('%1.3f%%'%(mutual_info_matrix_norm[x][y]), xy=(y, x),
+                            horizontalalignment='center',
+                            verticalalignment='center',color='white', fontsize=15)
+
+    ax.set_title(title,fontweight='bold',fontsize=15)
+    fig.colorbar(im)
+
+    tick_marks = np.arange(len(data_labels))
+    ax.xaxis.set_ticks(tick_marks)
+    ax.xaxis.set_ticklabels(data_labels,fontweight='bold',fontsize=15)
+
+    ax.yaxis.set_ticks(tick_marks)
+    ax.yaxis.set_ticklabels(data_labels,fontweight='bold',fontsize=15)
+    if save:
+        fig.savefig(output+'/'+name+'.pdf')
+        return plt.show()
+    else:
+        return plt.show()
+
+
+
 # https://gist.github.com/GaelVaroquaux/ead9898bd3c973c40429
 '''
     Non-parametric computation of entropy and mutual-information
