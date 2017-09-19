@@ -44,9 +44,8 @@ Está liberado todas as chaves para todos os runs e abaixo segue a receita das m
     * Laplace
     
 7. Mistura um elemento da matriz de mistura é alto (10) (Run 7):
-    * Gaussiana
     * Uniforme
-    * Rayleigh
+    * Gaussiana
     * Laplace
     * Chi-quadrado
     
